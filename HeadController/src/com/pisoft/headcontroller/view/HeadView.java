@@ -5,25 +5,38 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class HeadView extends View {
 	private Paint paint = new Paint();
 	
+	private int mouthHoleHeight = 10;
+	
 	public HeadView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 	
+	public void speak() {
+		mouthHoleHeight = mouthHoleHeight == 10 ? 15 : 10;
+				
+		invalidate();
+	}
+	
+	public void showDefaultLook() {
+		mouthHoleHeight = 10;
+		invalidate();
+	}
+
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
+
 		drawHeadOval(getWidth() - 40, getHeight() - 20, canvas);
         drawEyes(60, 80, canvas);
 		drawNose(80, 50, 50, canvas);
-		drawMounth(150, 70, 10, canvas);
+		drawMounth(150, 80 - mouthHoleHeight, mouthHoleHeight, canvas);
 	}
 	
 	
@@ -71,10 +84,10 @@ public class HeadView extends View {
 	}
 	
 	private void drawMounth(int yPosition, int width, int holeSize, Canvas canvas) {
-		paint.setColor(Color.RED);
+        paint.setColor(Color.RED);
 		
 		int midPoint = getWidth() / 2;
-		int lipDrop = 5;
+		int lipDrop = 5 - holeSize / 5;
 
 		canvas.drawLine(midPoint - width / 2, yPosition, midPoint - width / 3, yPosition + lipDrop, paint);
 		canvas.drawLine(midPoint - width / 3, yPosition + lipDrop, midPoint + width / 3, yPosition + lipDrop, paint);

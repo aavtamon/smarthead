@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.pisoft.headcontroller.head.HeadController;
 import com.pisoft.headcontroller.util.SystemUiHider;
 
 public class HtmlScreen extends Activity {
@@ -24,6 +25,12 @@ public class HtmlScreen extends Activity {
 		SystemUiHider mSystemUiHider = SystemUiHider.getInstance(this, contentView, SystemUiHider.FLAG_HIDE_NAVIGATION);
 		mSystemUiHider.setup();
 		mSystemUiHider.hide();
+	}
+	
+	protected void onStart() {
+		super.onStart();
+		
+		HeadController headController = new HeadController(this);
 	}
 
 }
