@@ -14,6 +14,7 @@ public class HeadController {
 	private final HeadVisual visual;
 	private final HeadHearing hearing;
 	private final HeadVision vision;
+	private final HeadMotion motion;
 	
 	public HeadController(final ControllingActivity activity) {
 		this.activity = activity;
@@ -22,11 +23,12 @@ public class HeadController {
 		visual = new HeadVisual(activity);
 		hearing = new HeadHearing(activity);
 		vision = new HeadVision(activity);
+		motion = new HeadMotion(activity);
 	}
 
 	@JavascriptInterface
 	public boolean isReady() {
-		return voice.isReady() && hearing.isReady() && vision.isReady();
+		return voice.isReady() && hearing.isReady() && vision.isReady() && motion.isReady();
 	}
 
 	@JavascriptInterface
@@ -66,8 +68,8 @@ public class HeadController {
 	}
 	
 	@JavascriptInterface
-	public boolean scanPeople(final String callback) {
-		return vision.scanPeople(new HeadVision.OnCompleteListener() {
+	public boolean detectFaces(final String callback) {
+		return vision.detectFaces(new HeadVision.OnCompleteListener() {
 			public void onComplete(Object data) {
 				activity.notifyJSCallback(callback, data);
 			}
@@ -75,14 +77,11 @@ public class HeadController {
 	}
 
 	@JavascriptInterface
-	public boolean lookAtNextPersonClockwise() {
-		return false;
+	public boolean rotate(final int degree, final String callback) {
+		return motion.rotate(degree, new HeadMotion.OnCompleteListener() {
+			public void onComplete() {
+				activity.notifyJSCallback(callback, null);
+			}
+		});
 	}
-
-	@JavascriptInterface
-	public boolean lookAtNextPersonAntiClockwise() {
-		return false;
-	}
-	
-	
 }

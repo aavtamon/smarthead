@@ -50,10 +50,8 @@ public class HeadVision {
 		
 	}
 	
-	public boolean scanPeople(final OnCompleteListener listener) {
+	public boolean detectFaces(final OnCompleteListener listener) {
 		if (!isReady()) {
-			listener.onComplete(null);
-			
 			return false;
 		}
 

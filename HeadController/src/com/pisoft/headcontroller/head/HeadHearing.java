@@ -32,8 +32,6 @@ public class HeadHearing {
 	
 	public boolean listen(final OnCompleteListener listener) {
 		if (!isReady()) {
-			listener.onComplete(null);
-			
 			return false;
 		}
 		

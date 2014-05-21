@@ -45,13 +45,22 @@ public class HeadVoice {
 	}
 	
 	public boolean say(final String text, final UtteranceProgressListener listener) {
+		if (!isReady()) {
+			return false;
+		}
+		
 		tts.setOnUtteranceProgressListener(listener);
 		tts.speak(text, TextToSpeech.QUEUE_FLUSH, speechParams);
 		
 		return true;
 	}
 	
-	public void stop() {
+	public boolean stop() {
+		if (!isReady()) {
+			return false;
+		}
+
 		tts.stop();
+		return true;
 	}
 }
