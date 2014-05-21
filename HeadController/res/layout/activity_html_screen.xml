@@ -16,4 +16,11 @@
         android:layout_marginLeft="100dp"
         android:layout_width="200dp"
         android:layout_height="200dp"/>
+    
+    <SurfaceView 
+        android:id="@+id/CameraPreview"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="600dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"/>
 </FrameLayout>

@@ -1,9 +1,12 @@
 package com.pisoft.headcontroller;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 
@@ -32,24 +35,57 @@ public class HtmlScreen extends ControllingActivity {
 		mSystemUiHider.hide();
 	}
 
-	protected void callJSCallback(final String callback, final String paramString) {
-		String javaScript = "headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](" + (paramString != null ? "'" + paramString  + "'" : "") + "); delete headController['___tempJSBridgeFunction'];";
+	protected void callJSCallback(final String callback, final Object params) {
+		String callbackParam = null;
+		if (params == null) {
+			callbackParam = "null";
+		} else if (params instanceof String) {
+			callbackParam = params.toString();
+		} else {
+			callbackParam = "JSON.parse(" + convertObjectToJson(params) + ")";
+		}
 		
+		String javaScript = "headController['___tempJSBridgeFunctionParam'] = " + callbackParam + "; "
+				            + "headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](headController['___tempJSBridgeFunctionParam']); "
+				            + "delete headController['___tempJSBridgeFunction']; delete headController['___tempJSBridgeFunctionParam'];";
+
 		webView.loadUrl("javascript:{ " + javaScript + " }");
 	}
 	
-	protected void callJSCallback(final String callback, final Map params) {
-		StringBuffer paramString = new StringBuffer("{");
-		for (Iterator<Map.Entry<String, String>> it = params.entrySet().iterator(); it.hasNext(); ) {
-			Map.Entry<String, String> entry = it.next();
-			paramString.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
+	
+	private String convertObjectToJson(final Object structure) {
+		if (structure instanceof Map) {
+			return convertMapToJson((Map)structure);
+		} else if (structure instanceof List) {
+			return convertListToJson((List)structure);
+		} else {
+			return "null";
 		}
-		paramString.append("{");
-
-		String javaScript = "headController['___tempJSBridgeFunctionParam'] = JSON.parse(" + paramString + "); "
-				            + "headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](headController['___tempJSBridgeFunctionParam']); "
-				            + "delete headController['___tempJSBridgeFunction']; delete headController['___tempJSBridgeFunctionParam'];";
-		
-		webView.loadUrl("javascript:{ " + javaScript + " }");
 	}
+	
+	private String convertMapToJson(final Map structure) {
+		StringBuffer paramString = new StringBuffer("{");
+		for (Iterator<Map.Entry<String, Object>> it = structure.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry<String, Object> entry = it.next();
+			
+			String jsonValue = convertObjectToJson(entry.getValue());
+			paramString.append(entry.getKey()).append(":").append(jsonValue).append(",");
+		}
+		paramString.append("}");
+		
+		return paramString.toString();
+	}
+	
+	
+	private String convertListToJson(final List structure) {
+		StringBuffer paramString = new StringBuffer("[");
+		for (Iterator it = structure.iterator(); it.hasNext(); ) {
+			String jsonValue = convertObjectToJson(it.next());
+			paramString.append(jsonValue).append(", ");
+		}
+		paramString.append("]");
+		
+		return paramString.toString();
+	}
+	
 }

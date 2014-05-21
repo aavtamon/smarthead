@@ -1,28 +1,53 @@
 package com.pisoft.headcontroller.head;
 
-import android.content.Intent;
-import android.graphics.Bitmap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.Face;
+import android.util.Log;
+import android.view.SurfaceView;
 
 import com.pisoft.headcontroller.ControllingActivity;
+import com.pisoft.headcontroller.R;
 
 public class HeadVision {
 	private final ControllingActivity activity;
-	private final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-	private boolean initialized;
+	private Camera camera;
+	private SurfaceView cameraPreviewSurface;
 	
 	public interface OnCompleteListener {
-		public void onComplete(String text);
-	}
-
-	private interface OnImageOperationListener {
 		public void onComplete(Object data);
 	}
-	
-	
+
+
 	public HeadVision(final ControllingActivity activity) {
 		this.activity = activity;
 		
-		initialized = captureIntent.resolveActivity(activity.getPackageManager()) != null;
+		cameraPreviewSurface = (SurfaceView)activity.findViewById(R.id.CameraPreview);
+		
+		int numOfCams = Camera.getNumberOfCameras();
+		for (int i = 0; i < numOfCams; i++) {
+			CameraInfo info = new CameraInfo();
+			Camera.getCameraInfo(i, info);
+			
+			if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+				try {
+					camera = Camera.open(i);
+					camera.setPreviewDisplay(cameraPreviewSurface.getHolder());
+					
+					camera.startPreview();
+				} catch (Exception e) {
+					Log.e("HeadController", "Failed to initialize a camera", e);
+				}
+				break;
+			}
+		}
+		
+		
 	}
 	
 	public boolean scanPeople(final OnCompleteListener listener) {
@@ -31,33 +56,33 @@ public class HeadVision {
 			
 			return false;
 		}
-		
-		takePicture(new OnImageOperationListener() {
-			public void onComplete(Object data) {
-				Bitmap photo = (Bitmap)data;
+
+		camera.setFaceDetectionListener(new Camera.FaceDetectionListener() {
+			public void onFaceDetection(Face[] faces, Camera camera) {
+				camera.stopFaceDetection();
 				
+				List<Map> result = new ArrayList<Map>();
+				
+				for (int i = 0; i < faces.length; i++) {
+					Face f = faces[i];
+					Map<String, Object> faceObject = new HashMap<String, Object>();
+					
+					faceObject.put("id", f.id);
+					faceObject.put("bounds", f.rect.toShortString());
+					
+					result.add(faceObject);
+				}
+				
+				listener.onComplete(result);
 			}
 		});
 		
-
+		camera.startFaceDetection();
+		
 		return true;
 	}
 	
 	public boolean isReady() {
-		return initialized;
-	}
-	
-
-	private void takePicture(final OnImageOperationListener listener) {
-		
-		activity.requestOperation(captureIntent, new ControllingActivity.OperationListener() {
-			public void onFailed() {
-			}
-			
-			public void onComplete(Intent result) {
-				Bitmap photo = (Bitmap)result.getExtras().get("data");
-				listener.onComplete(photo);
-			}
-		});
+		return camera != null;
 	}
 }

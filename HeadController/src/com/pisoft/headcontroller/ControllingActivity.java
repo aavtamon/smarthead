@@ -5,7 +5,6 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 
 public abstract class ControllingActivity extends Activity {
 	private int operationCode;
@@ -34,7 +33,7 @@ public abstract class ControllingActivity extends Activity {
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		OperationListener listener = operationListeners.remove(requestCode);
-Log.d("ANTON", "onActivityResult with " + resultCode);
+
 		if (listener != null) {
 			if (resultCode == RESULT_OK) {
 				listener.onComplete(data);
@@ -43,14 +42,14 @@ Log.d("ANTON", "onActivityResult with " + resultCode);
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
-	public void notifyJSCallback(final String callback, final String paramString) {
+	public void notifyJSCallback(final String callback, final Object params) {
 		runOnUiThread(new Runnable() {
 			public void run() {
-				callJSCallback(callback, paramString);
+				callJSCallback(callback, params);
 			}
 		});
 	}
 	
 	
-	protected abstract void callJSCallback(final String callback, final String paramString);
+	protected abstract void callJSCallback(final String callback, final Object params);
 }

@@ -3,7 +3,6 @@ package com.pisoft.headcontroller.head;
 import java.util.Locale;
 
 import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.pisoft.headcontroller.ControllingActivity;
@@ -69,8 +68,8 @@ public class HeadController {
 	@JavascriptInterface
 	public boolean scanPeople(final String callback) {
 		return vision.scanPeople(new HeadVision.OnCompleteListener() {
-			public void onComplete(String text) {
-				activity.notifyJSCallback(callback, text);
+			public void onComplete(Object data) {
+				activity.notifyJSCallback(callback, data);
 			}
 		});
 	}
