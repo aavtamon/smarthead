@@ -1,33 +1,46 @@
 package com.pisoft.headcontroller.head;
 
-import com.pisoft.headcontroller.R;
-import com.pisoft.headcontroller.view.HeadView;
+import java.util.Locale;
 
-import android.app.Activity;
-import android.os.Handler;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
+
+import com.pisoft.headcontroller.ControllingActivity;
 
 public class HeadController {
-	private HeadVoice voice;
-	private HeadVisual visual;
+	private final ControllingActivity activity;
 	
-	public HeadController(final Activity activity) {
-		voice = new HeadVoice(activity.getApplicationContext());
+	private final HeadVoice voice;
+	private final HeadVisual visual;
+	private final HeadHearing hearing;
+	
+	public HeadController(final ControllingActivity activity) {
+		this.activity = activity;
+		
+		voice = new HeadVoice(activity);
 		visual = new HeadVisual(activity);
-
-		new Handler().postDelayed(new Runnable() {
-			public void run() {
-				communicate("I can now speak and can do it really really long! I can actually speak forever");
-			}
-		}, 3000);
+		hearing = new HeadHearing(activity);
 	}
 
+	@JavascriptInterface
+	public boolean isReady() {
+		return voice.isReady() && hearing.isReady();
+	}
+
+	@JavascriptInterface
+	public void setLanguage(final String lang) {
+		if ("english".equalsIgnoreCase(lang)) {
+			voice.setLanguage(Locale.US);
+		} else if ("spanish".equalsIgnoreCase(lang)) {
+		}
+	}
 
 	
 	
-	public void communicate(final String text) {
-		voice.say(text, new UtteranceProgressListener() {
+	@JavascriptInterface
+	public boolean communicate(final String text) {
+		return voice.say(text, new UtteranceProgressListener() {
 			public void onStart(String utteranceId) {
 				visual.say(text);
 			}
@@ -42,8 +55,29 @@ public class HeadController {
 		});
 	}
 	
-	public String listen() {
-		return null;
+	@JavascriptInterface
+	public boolean listen(final String callback) {
+		return hearing.listen(new HeadHearing.OnCompleteListener() {
+			public void onComplete(String text) {
+				activity.notifyJSCallback(callback, text);
+			}
+		});
 	}
+	
+	@JavascriptInterface
+	public int scanPeople() {
+		return 0;
+	}
+
+	@JavascriptInterface
+	public boolean lookAtNextPersonClockwise() {
+		return false;
+	}
+
+	@JavascriptInterface
+	public boolean lookAtNextPersonAntiClockwise() {
+		return false;
+	}
+	
 	
 }

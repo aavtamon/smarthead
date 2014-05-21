@@ -1,20 +1,23 @@
 package com.pisoft.headcontroller;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 
 import com.pisoft.headcontroller.head.HeadController;
 import com.pisoft.headcontroller.util.SystemUiHider;
 
-public class HtmlScreen extends Activity {
+public class HtmlScreen extends ControllingActivity {
+	private WebView webView;
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_html_screen);
 
-		final WebView webView = (WebView)findViewById(R.id.MenuView);
+		webView = (WebView)findViewById(R.id.MenuView);
+		webView.addJavascriptInterface(new HeadController(this), "headController");
 		webView.loadUrl("http://10.13.26.90:8050/menu.html");
 		
 		
@@ -26,11 +29,8 @@ public class HtmlScreen extends Activity {
 		mSystemUiHider.setup();
 		mSystemUiHider.hide();
 	}
-	
-	protected void onStart() {
-		super.onStart();
-		
-		HeadController headController = new HeadController(this);
-	}
 
+	protected void callJSCallback(final String callback, final String paramString) {
+		webView.loadUrl("javascript:{ headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](" + (paramString != null ? "'" + paramString  + "'" : "") + "); delete headController['___tempJSBridgeFunction']; }");
+	}
 }

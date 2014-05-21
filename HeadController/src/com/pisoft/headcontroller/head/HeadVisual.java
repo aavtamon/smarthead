@@ -2,7 +2,6 @@ package com.pisoft.headcontroller.head;
 
 import android.app.Activity;
 import android.os.Handler;
-import android.util.Log;
 
 import com.pisoft.headcontroller.R;
 import com.pisoft.headcontroller.view.HeadView;

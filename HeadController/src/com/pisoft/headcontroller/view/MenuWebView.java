@@ -8,6 +8,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -56,7 +57,7 @@ public class MenuWebView extends WebView {
         getSettings().setSupportZoom(false);
 //        getSettings().setAllowUniversalAccessFromFileURLs(true);
         getSettings().setDomStorageEnabled(true);
-
+        getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
        
         setWebViewClient(new PortalClient());
         setWebChromeClient(new PortalViewChromeClient());

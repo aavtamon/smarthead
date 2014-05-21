@@ -3,7 +3,7 @@ package com.pisoft.headcontroller.head;
 import java.util.HashMap;
 import java.util.Locale;
 
-import android.content.Context;
+import android.app.Activity;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
@@ -18,8 +18,8 @@ public class HeadVoice {
 	private HashMap<String, String> speechParams;
 	
 	
-	public HeadVoice(final Context ctx) {
-		tts = new TextToSpeech(ctx, new TextToSpeech.OnInitListener() {
+	public HeadVoice(final Activity activity) {
+		tts = new TextToSpeech(activity.getApplicationContext(), new TextToSpeech.OnInitListener() {
 			public void onInit(int status) {
 		         if (status == TextToSpeech.SUCCESS) {
 		             tts.setLanguage(Locale.US);
@@ -40,9 +40,15 @@ public class HeadVoice {
 		tts.setLanguage(language);
 	}
 	
-	public void say(final String text, final UtteranceProgressListener listener) {
+	public boolean isReady() {
+		return initialized;
+	}
+	
+	public boolean say(final String text, final UtteranceProgressListener listener) {
 		tts.setOnUtteranceProgressListener(listener);
 		tts.speak(text, TextToSpeech.QUEUE_FLUSH, speechParams);
+		
+		return true;
 	}
 	
 	public void stop() {
