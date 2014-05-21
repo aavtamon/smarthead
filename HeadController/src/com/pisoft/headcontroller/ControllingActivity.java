@@ -5,6 +5,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 
 public abstract class ControllingActivity extends Activity {
 	private int operationCode;
@@ -33,7 +34,7 @@ public abstract class ControllingActivity extends Activity {
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		OperationListener listener = operationListeners.remove(requestCode);
-
+Log.d("ANTON", "onActivityResult with " + resultCode);
 		if (listener != null) {
 			if (resultCode == RESULT_OK) {
 				listener.onComplete(data);

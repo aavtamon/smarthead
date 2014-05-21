@@ -4,17 +4,15 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.os.Handler;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 
 import com.pisoft.headcontroller.ControllingActivity;
 
 public class HeadHearing {
 	private final ControllingActivity activity;
+	private final Intent recognizeIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 	private boolean initialized;
+	private String ietfLanguage = "en-US";
 	
 	public interface OnCompleteListener {
 		public void onComplete(String text);
@@ -23,13 +21,13 @@ public class HeadHearing {
 	public HeadHearing(final ControllingActivity activity) {
 		this.activity = activity;
 		
-		PackageManager pm = activity.getPackageManager();
-		List<ResolveInfo> recognizeActivities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-		
-		initialized = recognizeActivities.size() > 0;
+		initialized = recognizeIntent.resolveActivity(activity.getPackageManager()) != null;
 	}
 	
 	public void setLanguage(final Locale language) {
+		if (language == Locale.US) {
+			ietfLanguage = "en-US";
+		}
 	}
 	
 	public boolean listen(final OnCompleteListener listener) {
@@ -39,11 +37,11 @@ public class HeadHearing {
 			return false;
 		}
 		
-		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "I am listening...");
+		recognizeIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, ietfLanguage);
+		recognizeIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		recognizeIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "I am listening...");
 
-		activity.requestOperation(intent, new ControllingActivity.OperationListener() {
+		activity.requestOperation(recognizeIntent, new ControllingActivity.OperationListener() {
 			public void onFailed() {
 			}
 			

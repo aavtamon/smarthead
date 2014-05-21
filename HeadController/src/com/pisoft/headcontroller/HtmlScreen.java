@@ -1,7 +1,9 @@
 package com.pisoft.headcontroller;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 
@@ -31,6 +33,23 @@ public class HtmlScreen extends ControllingActivity {
 	}
 
 	protected void callJSCallback(final String callback, final String paramString) {
-		webView.loadUrl("javascript:{ headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](" + (paramString != null ? "'" + paramString  + "'" : "") + "); delete headController['___tempJSBridgeFunction']; }");
+		String javaScript = "headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](" + (paramString != null ? "'" + paramString  + "'" : "") + "); delete headController['___tempJSBridgeFunction'];";
+		
+		webView.loadUrl("javascript:{ " + javaScript + " }");
+	}
+	
+	protected void callJSCallback(final String callback, final Map params) {
+		StringBuffer paramString = new StringBuffer("{");
+		for (Iterator<Map.Entry<String, String>> it = params.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry<String, String> entry = it.next();
+			paramString.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
+		}
+		paramString.append("{");
+
+		String javaScript = "headController['___tempJSBridgeFunctionParam'] = JSON.parse(" + paramString + "); "
+				            + "headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](headController['___tempJSBridgeFunctionParam']); "
+				            + "delete headController['___tempJSBridgeFunction']; delete headController['___tempJSBridgeFunctionParam'];";
+		
+		webView.loadUrl("javascript:{ " + javaScript + " }");
 	}
 }

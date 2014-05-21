@@ -14,6 +14,7 @@ public class HeadController {
 	private final HeadVoice voice;
 	private final HeadVisual visual;
 	private final HeadHearing hearing;
+	private final HeadVision vision;
 	
 	public HeadController(final ControllingActivity activity) {
 		this.activity = activity;
@@ -21,11 +22,12 @@ public class HeadController {
 		voice = new HeadVoice(activity);
 		visual = new HeadVisual(activity);
 		hearing = new HeadHearing(activity);
+		vision = new HeadVision(activity);
 	}
 
 	@JavascriptInterface
 	public boolean isReady() {
-		return voice.isReady() && hearing.isReady();
+		return voice.isReady() && hearing.isReady() && vision.isReady();
 	}
 
 	@JavascriptInterface
@@ -65,8 +67,12 @@ public class HeadController {
 	}
 	
 	@JavascriptInterface
-	public int scanPeople() {
-		return 0;
+	public boolean scanPeople(final String callback) {
+		return vision.scanPeople(new HeadVision.OnCompleteListener() {
+			public void onComplete(String text) {
+				activity.notifyJSCallback(callback, text);
+			}
+		});
 	}
 
 	@JavascriptInterface
