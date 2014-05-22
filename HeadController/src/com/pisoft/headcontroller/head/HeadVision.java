@@ -1,5 +1,6 @@
 package com.pisoft.headcontroller.head;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,15 +10,16 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Face;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.pisoft.headcontroller.ControllingActivity;
 import com.pisoft.headcontroller.R;
 
 public class HeadVision {
-	private final ControllingActivity activity;
 	private Camera camera;
 	private SurfaceView cameraPreviewSurface;
+	private boolean initialized;
 	
 	public interface OnCompleteListener {
 		public void onComplete(Object data);
@@ -25,10 +27,6 @@ public class HeadVision {
 
 
 	public HeadVision(final ControllingActivity activity) {
-		this.activity = activity;
-		
-		cameraPreviewSurface = (SurfaceView)activity.findViewById(R.id.CameraPreview);
-		
 		int numOfCams = Camera.getNumberOfCameras();
 		for (int i = 0; i < numOfCams; i++) {
 			CameraInfo info = new CameraInfo();
@@ -37,15 +35,36 @@ public class HeadVision {
 			if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
 				try {
 					camera = Camera.open(i);
-					camera.setPreviewDisplay(cameraPreviewSurface.getHolder());
-					
-					camera.startPreview();
 				} catch (Exception e) {
 					Log.e("HeadController", "Failed to initialize a camera", e);
 				}
 				break;
 			}
 		}
+		
+		cameraPreviewSurface = (SurfaceView)activity.findViewById(R.id.CameraPreview);
+	    SurfaceHolder holder = cameraPreviewSurface.getHolder();
+	    holder.addCallback(new SurfaceHolder.Callback() {
+			public void surfaceDestroyed(SurfaceHolder holder) {
+				camera.stopPreview();
+			}
+			
+			public void surfaceCreated(SurfaceHolder holder) {
+				try {
+					camera.setPreviewDisplay(cameraPreviewSurface.getHolder());
+					camera.startPreview();
+					initialized = true;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					Log.e("HeadController", "Failed to initialize a preview surface", e);
+				}
+			}
+			
+			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			}
+		});
+
+		
 		
 		
 	}
@@ -59,7 +78,7 @@ public class HeadVision {
 			public void onFaceDetection(Face[] faces, Camera camera) {
 				camera.stopFaceDetection();
 				
-				List<Map> result = new ArrayList<Map>();
+				List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 				
 				for (int i = 0; i < faces.length; i++) {
 					Face f = faces[i];
@@ -81,6 +100,6 @@ public class HeadVision {
 	}
 	
 	public boolean isReady() {
-		return camera != null;
+		return initialized;
 	}
 }

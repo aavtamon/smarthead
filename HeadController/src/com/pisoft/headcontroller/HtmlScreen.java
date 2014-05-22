@@ -1,12 +1,10 @@
 package com.pisoft.headcontroller;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 
@@ -55,15 +53,15 @@ public class HtmlScreen extends ControllingActivity {
 	
 	private String convertObjectToJson(final Object structure) {
 		if (structure instanceof Map) {
-			return convertMapToJson((Map)structure);
+			return convertMapToJson((Map<String, Object>)structure);
 		} else if (structure instanceof List) {
-			return convertListToJson((List)structure);
+			return convertListToJson((List<Object>)structure);
 		} else {
 			return "null";
 		}
 	}
 	
-	private String convertMapToJson(final Map structure) {
+	private String convertMapToJson(final Map<String, Object> structure) {
 		StringBuffer paramString = new StringBuffer("{");
 		for (Iterator<Map.Entry<String, Object>> it = structure.entrySet().iterator(); it.hasNext(); ) {
 			Map.Entry<String, Object> entry = it.next();
@@ -77,9 +75,9 @@ public class HtmlScreen extends ControllingActivity {
 	}
 	
 	
-	private String convertListToJson(final List structure) {
+	private String convertListToJson(final List<Object> structure) {
 		StringBuffer paramString = new StringBuffer("[");
-		for (Iterator it = structure.iterator(); it.hasNext(); ) {
+		for (Iterator<Object> it = structure.iterator(); it.hasNext(); ) {
 			String jsonValue = convertObjectToJson(it.next());
 			paramString.append(jsonValue).append(", ");
 		}
