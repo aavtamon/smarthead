@@ -5,7 +5,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import android.app.Activity;
-import android.os.Handler;
 import android.util.Log;
 
 public class HeadMotion {
@@ -14,9 +13,18 @@ public class HeadMotion {
 	public interface OnCompleteListener {
 		public void onComplete();
 	}
+
+	private interface NetworkOperationListener {
+		public void onComplete(int status);
+	}
+	
 	
 	public HeadMotion(final Activity activity) {
-		initialized = sendCommandToMotionDriver("isReady") == 200;
+		sendCommandToMotionDriver("isReady", new NetworkOperationListener() {
+			public void onComplete(int status) {
+				initialized = status == 200;
+			}
+		});
 	}
 	
 	public boolean isReady() {
@@ -28,43 +36,41 @@ public class HeadMotion {
 			return false;
 		}
 		
-		notifyWhenFinished(listener);
-		
-		return sendCommandToMotionDriver("rotate?degree=" + degree) == 202;
-	}
-	
-	
-	private void notifyWhenFinished(final OnCompleteListener listener) {
-		new Handler().postDelayed(new Runnable() {
-			public void run() {
-				if (sendCommandToMotionDriver("isIdle") == 200) {
+		sendCommandToMotionDriver("rotate?degree=" + degree, new NetworkOperationListener() {
+			public void onComplete(int status) {
+				if (status == 200) {
 					listener.onComplete();
-				} else {
-					notifyWhenFinished(listener);
 				}
 			}
-		}, 1000);
+		});
+		
+		return true;
 	}
 	
-	private int sendCommandToMotionDriver(final String command) {
-		HttpURLConnection connection = null;
+	
+	private void sendCommandToMotionDriver(final String command, final NetworkOperationListener listener) {
+		new Thread() {
+			public void run() {
+				HttpURLConnection connection = null;
+				
+				try {
+					URL driverHttpInterface = new URL("http://192.168.1.3/motion_control/" + (command != null ? command : ""));
+					
+					connection = (HttpURLConnection)driverHttpInterface.openConnection();
+					connection.setRequestMethod("GET");
+					
+					connection.connect();
 		
-		try {
-			URL driverHttpInterface = new URL("http://192.168.1.3/motion_control/" + (command != null ? command : ""));
-			
-			connection = (HttpURLConnection)driverHttpInterface.openConnection();
-			connection.setRequestMethod("GET");
-			
-			connection.connect();
-
-			return connection.getResponseCode();
-		} catch (IOException ioe) {
-			Log.e("HeadControloler", "Failed to connect to the motion driver", ioe);
-			return -1;
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
+					listener.onComplete(connection.getResponseCode());
+				} catch (IOException ioe) {
+					Log.e("HeadControloler", "Failed to connect to the motion driver", ioe);
+					listener.onComplete(-1);
+				} finally {
+					if (connection != null) {
+						connection.disconnect();
+					}
+				}
 			}
-		}
+		}.start();
 	}
 }

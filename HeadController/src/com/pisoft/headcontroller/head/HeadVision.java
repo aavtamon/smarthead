@@ -42,6 +42,11 @@ public class HeadVision {
 			}
 		}
 		
+		if (camera == null) {
+			Log.e("HeadController", "No suitable camera found");
+			return;
+		}
+		
 		cameraPreviewSurface = (SurfaceView)activity.findViewById(R.id.CameraPreview);
 	    SurfaceHolder holder = cameraPreviewSurface.getHolder();
 	    holder.addCallback(new SurfaceHolder.Callback() {

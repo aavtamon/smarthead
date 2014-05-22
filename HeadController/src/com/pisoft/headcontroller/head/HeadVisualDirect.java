@@ -1,57 +1,111 @@
-package com.pisoft.headcontroller.view;
+package com.pisoft.headcontroller.head;
 
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.PixelFormat;
 import android.graphics.RectF;
-import android.util.AttributeSet;
-import android.view.View;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
-public class HeadView extends View {
-	private Paint paint = new Paint();
+import com.pisoft.headcontroller.R;
+
+public class HeadVisualDirect {
+	private final SurfaceHolder headHolder;
+	
+	private boolean initialized;
+	
+	private Thread animationThread;
 	
 	private int mouthHoleHeight = 10;
+	private Paint paint = new Paint();
 	
-	public HeadView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public HeadVisualDirect(final Activity activity) {
+		SurfaceView view = (SurfaceView)activity.findViewById(R.id.HeadDirect);
+		headHolder = view.getHolder();
+		headHolder.setFormat(PixelFormat.TRANSLUCENT);
+		view.setZOrderOnTop(true);
+		headHolder.addCallback(new SurfaceHolder.Callback() {
+			public void surfaceDestroyed(SurfaceHolder holder) {
+				initialized = false;
+			}
+			
+			public void surfaceCreated(SurfaceHolder holder) {
+				initialized = true;
+				draw();
+			}
+			
+			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			}
+		});
 	}
 	
-	public void speak() {
-		mouthHoleHeight = mouthHoleHeight == 10 ? 15 : 10;
-				
-		invalidate();
+	
+	public boolean isReady() {
+		return initialized;
 	}
 	
-	public void showDefaultLook() {
-		mouthHoleHeight = 10;
-		invalidate();
+	public boolean say(final String text) {
+		if (!isReady()) {
+			return false;
+		}
+		
+		animationThread = new Thread() {
+			public void run() {
+				while (true) {
+					mouthHoleHeight = mouthHoleHeight == 10 ? 15 : 10;
+					draw();
+					
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						mouthHoleHeight = 10;
+						draw();
+						return;
+					}
+				}
+			};
+		};
+		animationThread.start();
+		
+		return true;
 	}
-
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-
-		drawHeadOval(getWidth() - 40, getHeight() - 20, canvas);
+	
+	public void stop() {
+		if (animationThread != null) {
+			animationThread.interrupt();
+			animationThread = null;
+		}
+	}
+	
+	
+	
+	public void draw() {
+		Canvas canvas = headHolder.lockCanvas();
+		
+		drawHeadOval(headHolder.getSurfaceFrame().width() - 40, headHolder.getSurfaceFrame().height() - 20, canvas);
         drawEyes(60, 80, canvas);
 		drawNose(80, 50, 50, canvas);
 		drawMounth(150, 80 - mouthHoleHeight, mouthHoleHeight, canvas);
+		
+		headHolder.unlockCanvasAndPost(canvas);
 	}
-	
 	
 	private void drawHeadOval(int width, int height, Canvas canvas) {
 		paint.setColor(Color.GREEN);
 		paint.setStyle(Style.FILL);
 
-		int widthMidPoint = getWidth() / 2;
-		int heightMidPoint = getHeight() / 2;
+		int widthMidPoint = headHolder.getSurfaceFrame().width() / 2;
+		int heightMidPoint = headHolder.getSurfaceFrame().height() / 2;
 		
 		RectF headOval = new RectF(widthMidPoint - width / 2, heightMidPoint - height / 2, widthMidPoint + width / 2, heightMidPoint + height / 2);
 		canvas.drawOval(headOval, paint);
 	}
 	
 	private void drawEyes(int yPosition, int width, Canvas canvas) {
-		int midPoint = getWidth() / 2;
+		int midPoint = headHolder.getSurfaceFrame().width() / 2;
 
 		drawEye(midPoint - width / 2, yPosition, canvas);
 		drawEye(midPoint + width / 2, yPosition, canvas);
@@ -77,7 +131,7 @@ public class HeadView extends View {
 	private void drawNose(int yPosition, int width, int height, Canvas canvas) {
 		paint.setColor(Color.DKGRAY);
 		
-		int midPoint = getWidth() / 2;
+		int midPoint = headHolder.getSurfaceFrame().width() / 2;
 		canvas.drawLine(midPoint, yPosition, midPoint - width / 2, yPosition + height, paint);
 		canvas.drawLine(midPoint - width / 2, yPosition + height, midPoint + width / 2, yPosition + height, paint);
 	}
@@ -85,7 +139,7 @@ public class HeadView extends View {
 	private void drawMounth(int yPosition, int width, int holeSize, Canvas canvas) {
         paint.setColor(Color.RED);
 		
-		int midPoint = getWidth() / 2;
+		int midPoint = headHolder.getSurfaceFrame().width() / 2;
 		int lipDrop = 5 - holeSize / 5;
 
 		canvas.drawLine(midPoint - width / 2, yPosition, midPoint - width / 3, yPosition + lipDrop, paint);
@@ -96,5 +150,4 @@ public class HeadView extends View {
 		canvas.drawLine(midPoint - width / 4, yPosition + lipDrop + holeSize, midPoint + width / 4, yPosition + lipDrop + holeSize, paint);
 		canvas.drawLine(midPoint + width / 4, yPosition + lipDrop + holeSize, midPoint + width / 2, yPosition, paint);
 	}
-
 }

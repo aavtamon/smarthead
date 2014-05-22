@@ -11,7 +11,7 @@ public class HeadController {
 	private final ControllingActivity activity;
 	
 	private final HeadVoice voice;
-	private final HeadVisual visual;
+	private final HeadVisualDirect visual;
 	private final HeadHearing hearing;
 	private final HeadVision vision;
 	private final HeadMotion motion;
@@ -20,7 +20,7 @@ public class HeadController {
 		this.activity = activity;
 		
 		voice = new HeadVoice(activity);
-		visual = new HeadVisual(activity);
+		visual = new HeadVisualDirect(activity);
 		hearing = new HeadHearing(activity);
 		vision = new HeadVision(activity);
 		motion = new HeadMotion(activity);
