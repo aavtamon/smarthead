@@ -84,4 +84,9 @@ public class HeadController {
 			}
 		});
 	}
+	
+	@JavascriptInterface
+	public int getCurrentAngle() {
+		return motion.getCurrentAngle();
+	}
 }
