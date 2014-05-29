@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Face;
@@ -48,7 +49,9 @@ public class HeadVision {
 		}
 		
 		cameraPreviewSurface = (SurfaceView)activity.findViewById(R.id.CameraPreview);
+		cameraPreviewSurface.setZOrderOnTop(true);
 	    SurfaceHolder holder = cameraPreviewSurface.getHolder();
+	    
 	    holder.addCallback(new SurfaceHolder.Callback() {
 			public void surfaceDestroyed(SurfaceHolder holder) {
 				camera.stopPreview();
