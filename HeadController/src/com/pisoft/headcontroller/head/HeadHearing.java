@@ -41,6 +41,7 @@ public class HeadHearing {
 
 		activity.requestOperation(recognizeIntent, new ControllingActivity.OperationListener() {
 			public void onFailed() {
+				listener.onComplete(null);
 			}
 			
 			public void onComplete(Intent result) {

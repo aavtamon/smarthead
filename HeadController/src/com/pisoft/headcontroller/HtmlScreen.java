@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 
 import com.pisoft.headcontroller.head.HeadController;
@@ -18,10 +20,11 @@ public class HtmlScreen extends ControllingActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_html_screen);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		webView = (WebView)findViewById(R.id.MenuView);
 		webView.addJavascriptInterface(new HeadController(this), "headController");
-		webView.loadUrl("http://10.13.26.90:8050/menu.html");
+		webView.loadUrl("http://192.168.0.102:8050/menu.html");
 		
 		
 		final View contentView = findViewById(R.id.MainFrame);
@@ -38,7 +41,7 @@ public class HtmlScreen extends ControllingActivity {
 		if (params == null) {
 			callbackParam = "null";
 		} else if (params instanceof String) {
-			callbackParam = params.toString();
+			callbackParam = "\"" + params.toString() + "\"";
 		} else {
 			callbackParam = "JSON.parse(" + convertObjectToJson(params) + ")";
 		}

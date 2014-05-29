@@ -37,6 +37,8 @@ public abstract class ControllingActivity extends Activity {
 		if (listener != null) {
 			if (resultCode == RESULT_OK) {
 				listener.onComplete(data);
+			} else {
+				listener.onFailed();
 			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);

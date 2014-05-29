@@ -3,6 +3,7 @@ package com.pisoft.headcontroller.head;
 import java.util.Locale;
 
 import android.speech.tts.UtteranceProgressListener;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.pisoft.headcontroller.ControllingActivity;
@@ -42,7 +43,7 @@ public class HeadController {
 	
 	
 	@JavascriptInterface
-	public boolean communicate(final String text) {
+	public boolean communicate(final String text, final String callback) {
 		return voice.say(text, new UtteranceProgressListener() {
 			public void onStart(String utteranceId) {
 				visual.say(text);
@@ -54,6 +55,7 @@ public class HeadController {
 			
 			public void onDone(String utteranceId) {
 				visual.stop();
+				activity.notifyJSCallback(callback, null);
 			}
 		});
 	}
