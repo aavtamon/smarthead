@@ -8,20 +8,27 @@ import android.speech.RecognizerIntent;
 
 import com.pisoft.headcontroller.ControllingActivity;
 
-public class HeadHearing {
-	private final ControllingActivity activity;
+public class HeadHearing extends AbstractHeadSense {
 	private final Intent recognizeIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-	private boolean initialized;
-	private String ietfLanguage = "en-US";
+	private String ietfLanguage;
 	
 	public interface OnCompleteListener {
 		public void onComplete(String text);
 	}
 	
 	public HeadHearing(final ControllingActivity activity) {
-		this.activity = activity;
+		super(activity);
 		
-		initialized = recognizeIntent.resolveActivity(activity.getPackageManager()) != null;
+		if (recognizeIntent.resolveActivity(activity.getPackageManager()) != null) {
+			markReady();
+		}
+	}
+	
+	protected void init() {
+		setLanguage(Locale.US);
+	}
+
+	protected void destroy() {
 	}
 	
 	public void setLanguage(final Locale language) {
@@ -55,11 +62,7 @@ public class HeadHearing {
 		return true;
 	}
 	
-	public boolean isReady() {
-		return initialized;
-	}
-	
-	
+
 	private String getBestMatch(final List<String> candidates) {
 		if (candidates.size() > 0) {
 			return candidates.get(0);

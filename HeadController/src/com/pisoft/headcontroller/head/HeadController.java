@@ -3,7 +3,6 @@ package com.pisoft.headcontroller.head;
 import java.util.Locale;
 
 import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.pisoft.headcontroller.ControllingActivity;
@@ -26,6 +25,23 @@ public class HeadController {
 		vision = new HeadVision(activity);
 		motion = new HeadMotion(activity);
 	}
+	
+	public void init() {
+		voice.init();
+		visual.init();
+		hearing.init();
+		vision.init();
+		motion.init();
+	}
+	
+	public void destroy() {
+		voice.destroy();
+		visual.destroy();
+		hearing.destroy();
+		vision.destroy();
+		motion.destroy();
+	}
+	
 
 	@JavascriptInterface
 	public boolean isReady() {

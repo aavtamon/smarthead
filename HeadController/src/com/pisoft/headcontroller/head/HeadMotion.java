@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,10 +13,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public class HeadMotion {
+import com.pisoft.headcontroller.ControllingActivity;
+
+public class HeadMotion extends AbstractHeadSense {
 	private static final int NUM_OF_READINGS_TO_AVERAGE = 30;
-	
-	private boolean initialized;
 	
 	private List<Integer> angleReadings = new ArrayList<Integer>(NUM_OF_READINGS_TO_AVERAGE);
 	
@@ -30,7 +29,11 @@ public class HeadMotion {
 	}
 	
 	
-	public HeadMotion(final Activity activity) {
+	public HeadMotion(final ControllingActivity activity) {
+		super(activity);
+	}
+	
+	protected void init() {
 		SensorManager sm = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
 		
 		SensorEventListener sl = new SensorEventListener() {
@@ -80,13 +83,14 @@ public class HeadMotion {
 		
 		sendCommandToMotionDriver("isReady", new NetworkOperationListener() {
 			public void onComplete(int status) {
-				initialized = status == 200;
+				if (status == 200) {
+					markReady();
+				}
 			}
 		});
 	}
-	
-	public boolean isReady() {
-		return initialized;
+
+	protected void destroy() {
 	}
 	
 	public boolean rotate(final int degree, final OnCompleteListener listener) {

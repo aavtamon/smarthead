@@ -1,6 +1,5 @@
 package com.pisoft.headcontroller.head;
 
-import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,30 +9,33 @@ import android.graphics.RectF;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.pisoft.headcontroller.ControllingActivity;
 import com.pisoft.headcontroller.R;
 
-public class HeadVisualDirect {
-	private final SurfaceHolder headHolder;
-	
-	private boolean initialized;
+public class HeadVisualDirect extends AbstractHeadSense {
+	private SurfaceHolder headHolder;
 	
 	private Thread animationThread;
 	
 	private int mouthHoleHeight = 10;
 	private Paint paint = new Paint();
 	
-	public HeadVisualDirect(final Activity activity) {
+	public HeadVisualDirect(final ControllingActivity activity) {
+		super(activity);
+	}
+
+	protected void init() {
 		SurfaceView view = (SurfaceView)activity.findViewById(R.id.HeadDirect);
 		headHolder = view.getHolder();
 		headHolder.setFormat(PixelFormat.TRANSLUCENT);
 		view.setZOrderOnTop(true);
 		headHolder.addCallback(new SurfaceHolder.Callback() {
 			public void surfaceDestroyed(SurfaceHolder holder) {
-				initialized = false;
+				markNotReady();
 			}
 			
 			public void surfaceCreated(SurfaceHolder holder) {
-				initialized = true;
+				markReady();
 				draw();
 			}
 			
@@ -42,9 +44,8 @@ public class HeadVisualDirect {
 		});
 	}
 	
-	
-	public boolean isReady() {
-		return initialized;
+	protected void destroy() {
+		stop();
 	}
 	
 	public boolean say(final String text) {

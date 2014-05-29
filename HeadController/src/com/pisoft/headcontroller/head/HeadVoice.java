@@ -3,27 +3,31 @@ package com.pisoft.headcontroller.head;
 import java.util.HashMap;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 
-public class HeadVoice {
+import com.pisoft.headcontroller.ControllingActivity;
+
+public class HeadVoice extends AbstractHeadSense {
 	public interface OnCompleteListener {
 		public void onComplete();
 	}
 	
 	private TextToSpeech tts; 
-	private boolean initialized = false;
 	private HashMap<String, String> speechParams;
 	
 	
-	public HeadVoice(final Activity activity) {
+	public HeadVoice(final ControllingActivity activity) {
+		super(activity);
+	}
+	
+	protected void init() {
 		tts = new TextToSpeech(activity.getApplicationContext(), new TextToSpeech.OnInitListener() {
 			public void onInit(int status) {
 		         if (status == TextToSpeech.SUCCESS) {
 		             tts.setLanguage(Locale.US);
-		             initialized = true;
+		             markReady();
 		             
 		             speechParams = new HashMap<String, String>();
 		             speechParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "any");             
@@ -36,13 +40,14 @@ public class HeadVoice {
 		});
 	}
 	
+	protected void destroy() {
+		tts.shutdown();
+	}
+	
 	public void setLanguage(final Locale language) {
 		tts.setLanguage(language);
 	}
 	
-	public boolean isReady() {
-		return initialized;
-	}
 	
 	public boolean say(final String text, final UtteranceProgressListener listener) {
 		if (!isReady()) {

@@ -15,6 +15,7 @@ import com.pisoft.headcontroller.util.SystemUiHider;
 
 public class HtmlScreen extends ControllingActivity {
 	private WebView webView;
+	private HeadController headController;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -22,10 +23,11 @@ public class HtmlScreen extends ControllingActivity {
 		setContentView(R.layout.activity_html_screen);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+
+		headController = new HeadController(this);
+
 		webView = (WebView)findViewById(R.id.MenuView);
-		webView.addJavascriptInterface(new HeadController(this), "headController");
-		webView.loadUrl("http://192.168.0.102:8050/menu.html");
-		
+		webView.addJavascriptInterface(headController, "headController");
 		
 		final View contentView = findViewById(R.id.MainFrame);
 
@@ -34,6 +36,20 @@ public class HtmlScreen extends ControllingActivity {
 		SystemUiHider mSystemUiHider = SystemUiHider.getInstance(this, contentView, SystemUiHider.FLAG_HIDE_NAVIGATION);
 		mSystemUiHider.setup();
 		mSystemUiHider.hide();
+	}
+	
+	protected void onStart() {
+		super.onStart();
+		
+		headController.init();
+		
+		webView.loadUrl("http://192.168.0.102:8050/menu.html");
+	}
+	
+	protected void onDestroy() {
+		headController.destroy();
+
+		super.onDestroy();
 	}
 
 	protected void callJSCallback(final String callback, final Object params) {
@@ -88,5 +104,4 @@ public class HtmlScreen extends ControllingActivity {
 		
 		return paramString.toString();
 	}
-	
 }

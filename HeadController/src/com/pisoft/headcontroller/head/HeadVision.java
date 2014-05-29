@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Face;
@@ -17,10 +16,9 @@ import android.view.SurfaceView;
 import com.pisoft.headcontroller.ControllingActivity;
 import com.pisoft.headcontroller.R;
 
-public class HeadVision {
+public class HeadVision extends AbstractHeadSense {
 	private Camera camera;
 	private SurfaceView cameraPreviewSurface;
-	private boolean initialized;
 	
 	public interface OnCompleteListener {
 		public void onComplete(Object data);
@@ -28,6 +26,10 @@ public class HeadVision {
 
 
 	public HeadVision(final ControllingActivity activity) {
+		super(activity);
+	}
+	
+	protected void init() {
 		int numOfCams = Camera.getNumberOfCameras();
 		for (int i = 0; i < numOfCams; i++) {
 			CameraInfo info = new CameraInfo();
@@ -61,7 +63,7 @@ public class HeadVision {
 				try {
 					camera.setPreviewDisplay(cameraPreviewSurface.getHolder());
 					camera.startPreview();
-					initialized = true;
+					markReady();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					Log.e("HeadController", "Failed to initialize a preview surface", e);
@@ -71,11 +73,14 @@ public class HeadVision {
 			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 			}
 		});
-
-		
-		
-		
 	}
+	
+	protected void destroy() {
+		if (camera != null) {
+			camera.release();
+		}
+	}
+
 	
 	public boolean detectFaces(final OnCompleteListener listener) {
 		if (!isReady()) {
@@ -105,9 +110,5 @@ public class HeadVision {
 		camera.startFaceDetection();
 		
 		return true;
-	}
-	
-	public boolean isReady() {
-		return initialized;
 	}
 }
