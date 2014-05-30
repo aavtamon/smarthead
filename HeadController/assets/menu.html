@@ -1,0 +1,30 @@
+<html>
+	<script>
+	    function start() {
+	    	setTimeout(useHeadController, 2000);
+	    }
+	
+		function useHeadController() {
+			document.getElementById("readiness").innerHTML = "<center>Readiness: " + headController.isReady() + "</center>";
+			
+			headController.communicate("Hello from a Super Head!", "" + function() {
+				document.getElementById("message_area").innerHTML = "<center>Speaking finished</center>";
+				
+				/*headController.listen("" + function(heardMText) {
+					document.getElementById("message_area").innerHTML = "<center>Heard: " + heardMText + "</center>";
+					
+				});*/
+				
+				headController.detectFaces("" + function(scanInfo) {
+					document.getElementById("message_area").innerHTML = "<center>Faces detected!!!!</center>";
+				});
+			});
+		}
+	</script>
+	
+	<body onload="start()">
+		<h1><center>Welcome To The Super Head!</center></h1>
+		<h2 id="readiness">Readiness Area</h2>
+		<h2 id="message_area">Messages</h2>
+	</body>
+</html>

@@ -18,6 +18,8 @@ import com.pisoft.headcontroller.ControllingActivity;
 public class HeadMotion extends AbstractHeadSense {
 	private static final int NUM_OF_READINGS_TO_AVERAGE = 30;
 	
+	private final String motionDriverIpAddress;
+	
 	private List<Integer> angleReadings = new ArrayList<Integer>(NUM_OF_READINGS_TO_AVERAGE);
 	
 	public interface OnCompleteListener {
@@ -29,8 +31,10 @@ public class HeadMotion extends AbstractHeadSense {
 	}
 	
 	
-	public HeadMotion(final ControllingActivity activity) {
+	public HeadMotion(final ControllingActivity activity, final String motionDriverIpAddress) {
 		super(activity);
+		
+		this.motionDriverIpAddress = motionDriverIpAddress; 
 	}
 	
 	protected void init() {
@@ -121,12 +125,17 @@ public class HeadMotion extends AbstractHeadSense {
 	
 	
 	private void sendCommandToMotionDriver(final String command, final NetworkOperationListener listener) {
+		if (motionDriverIpAddress == null) {
+			Log.e("HeadController", "Motion driver IP is not provided");
+			return;
+		}
+		
 		new Thread() {
 			public void run() {
 				HttpURLConnection connection = null;
 				
 				try {
-					URL driverHttpInterface = new URL("http://192.168.1.3/motion_control/" + (command != null ? command : ""));
+					URL driverHttpInterface = new URL("http://" + motionDriverIpAddress + "/motion_control/" + (command != null ? command : ""));
 					
 					connection = (HttpURLConnection)driverHttpInterface.openConnection();
 					connection.setRequestMethod("GET");

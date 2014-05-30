@@ -1,5 +1,10 @@
 package com.pisoft.headcontroller;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +21,7 @@ import com.pisoft.headcontroller.util.SystemUiHider;
 public class HtmlScreen extends ControllingActivity {
 	private WebView webView;
 	private HeadController headController;
+	private Map<String, String> config;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -23,8 +29,9 @@ public class HtmlScreen extends ControllingActivity {
 		setContentView(R.layout.activity_html_screen);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-
-		headController = new HeadController(this);
+		readConfigFile();
+		
+		headController = new HeadController(this, config);
 
 		webView = (WebView)findViewById(R.id.MenuView);
 		webView.addJavascriptInterface(headController, "headController");
@@ -42,8 +49,15 @@ public class HtmlScreen extends ControllingActivity {
 		super.onStart();
 		
 		headController.init();
-		
-		webView.loadUrl("http://192.168.0.102:8050/menu.html");
+
+		String url = config.get("startUrl");
+		if (url == null) {
+			Log.w("HeadController", "No startUrl in the config file - assuming built in");
+			url = "file:///android_asset/menu.html";
+		}
+
+		//webView.loadUrl("http://192.168.0.102:8050/menu.html");
+		webView.loadUrl(url);
 	}
 	
 	protected void onDestroy() {
@@ -103,5 +117,31 @@ public class HtmlScreen extends ControllingActivity {
 		paramString.append("]");
 		
 		return paramString.toString();
+	}
+	
+	
+	private void readConfigFile() {
+		config = new HashMap<String, String>();
+		
+		File configFile = new File(getExternalFilesDir(null), "config.txt");
+		if (!configFile.isFile()) {
+			return;
+		}
+		
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(configFile));
+			String nextLine;
+			while((nextLine = reader.readLine()) != null) {
+				String[] parts = nextLine.split("=");
+				if (parts.length != 2) {
+					Log.e("HeadController", "Error in the config file: " + nextLine);
+				} else {
+					config.put(parts[0], parts[1]);
+				}
+			}
+			reader.close();
+		} catch (IOException ioe) {
+			Log.e("HeadController", "Error reading config file", ioe);
+		}
 	}
 }

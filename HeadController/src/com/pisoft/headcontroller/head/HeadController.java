@@ -1,6 +1,7 @@
 package com.pisoft.headcontroller.head;
 
 import java.util.Locale;
+import java.util.Map;
 
 import android.speech.tts.UtteranceProgressListener;
 import android.webkit.JavascriptInterface;
@@ -16,14 +17,14 @@ public class HeadController {
 	private final HeadVision vision;
 	private final HeadMotion motion;
 	
-	public HeadController(final ControllingActivity activity) {
+	public HeadController(final ControllingActivity activity, final Map<String, String> config) {
 		this.activity = activity;
 		
 		voice = new HeadVoice(activity);
 		visual = new HeadVisualDirect(activity);
 		hearing = new HeadHearing(activity);
 		vision = new HeadVision(activity);
-		motion = new HeadMotion(activity);
+		motion = new HeadMotion(activity, config.get("motionDriverIP"));
 	}
 	
 	public void init() {

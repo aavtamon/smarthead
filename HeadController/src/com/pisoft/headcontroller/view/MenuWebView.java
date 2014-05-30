@@ -55,7 +55,7 @@ public class MenuWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setSupportZoom(false);
-//        getSettings().setAllowUniversalAccessFromFileURLs(true);
+        getSettings().setAllowUniversalAccessFromFileURLs(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
        
