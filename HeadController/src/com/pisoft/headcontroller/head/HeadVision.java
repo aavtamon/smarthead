@@ -82,14 +82,17 @@ public class HeadVision extends AbstractHeadSense {
 	}
 
 	
-	public boolean detectFaces(final OnCompleteListener listener) {
+	public boolean detectFaces(final OnCompleteListener listener, final boolean continuesDetectionMode) {
 		if (!isReady()) {
 			return false;
 		}
+		camera.stopFaceDetection();
 
 		camera.setFaceDetectionListener(new Camera.FaceDetectionListener() {
 			public void onFaceDetection(Face[] faces, Camera camera) {
-				camera.stopFaceDetection();
+				if (!continuesDetectionMode) {
+					camera.stopFaceDetection();
+				}
 				
 				List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 				
@@ -108,7 +111,7 @@ public class HeadVision extends AbstractHeadSense {
 		});
 		
 		camera.startFaceDetection();
-		
+
 		return true;
 	}
 }

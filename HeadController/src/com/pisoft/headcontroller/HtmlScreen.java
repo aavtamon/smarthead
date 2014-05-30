@@ -73,7 +73,7 @@ public class HtmlScreen extends ControllingActivity {
 		} else if (params instanceof String) {
 			callbackParam = "\"" + params.toString() + "\"";
 		} else {
-			callbackParam = "JSON.parse(" + convertObjectToJson(params) + ")";
+			callbackParam = convertObjectToJson(params);
 		}
 		
 		String javaScript = "headController['___tempJSBridgeFunctionParam'] = " + callbackParam + "; "
@@ -89,8 +89,12 @@ public class HtmlScreen extends ControllingActivity {
 			return convertMapToJson((Map<String, Object>)structure);
 		} else if (structure instanceof List) {
 			return convertListToJson((List<Object>)structure);
-		} else {
+		} else if (structure == null) {
 			return "null";
+		} else if (structure instanceof Number) {
+			return structure.toString();
+		} else {
+			return "\"" + structure.toString() + "\"";
 		}
 	}
 	

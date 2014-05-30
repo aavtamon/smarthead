@@ -87,12 +87,12 @@ public class HeadController {
 	}
 	
 	@JavascriptInterface
-	public boolean detectFaces(final String callback) {
+	public boolean detectFaces(final String callback, final boolean continuesDetectionMode) {
 		return vision.detectFaces(new HeadVision.OnCompleteListener() {
 			public void onComplete(Object data) {
 				activity.notifyJSCallback(callback, data);
 			}
-		});
+		}, continuesDetectionMode);
 	}
 
 	@JavascriptInterface
