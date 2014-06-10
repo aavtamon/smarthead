@@ -21,13 +21,20 @@ public class HeadVisual extends AbstractHeadSense {
 		markReady();
 	}
 	
-	protected void destroy() {
+	protected void pause() {
+		stop();
 	}
 
-	public void say(final String text) {
+	protected void destroy() {
+		stop();
+	}
+
+	public boolean say(final String text) {
 		isStopped = false;
 
 		animateSpeakAndScheduleNextAnimation();
+		
+		return true;
 	}
 	
 	public void stop() {

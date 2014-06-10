@@ -12,7 +12,7 @@ import android.view.SurfaceView;
 import com.pisoft.headcontroller.ControllingActivity;
 import com.pisoft.headcontroller.R;
 
-public class HeadVisualDirect extends AbstractHeadSense {
+public class HeadVisualDirect extends HeadVisual {
 	private SurfaceHolder headHolder;
 	
 	private Thread animationThread;
@@ -44,6 +44,10 @@ public class HeadVisualDirect extends AbstractHeadSense {
 		});
 	}
 	
+	protected void pause() {
+		stop();
+	}
+
 	protected void destroy() {
 		stop();
 	}

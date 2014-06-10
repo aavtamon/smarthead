@@ -12,7 +12,7 @@ public class HeadController {
 	private final ControllingActivity activity;
 	
 	private final HeadVoice voice;
-	private final HeadVisualDirect visual;
+	private final HeadVisual visual;
 	private final HeadHearing hearing;
 	private final HeadVision vision;
 	private final HeadMotion motion;
@@ -21,9 +21,21 @@ public class HeadController {
 		this.activity = activity;
 		
 		voice = new HeadVoice(activity);
-		visual = new HeadVisualDirect(activity);
+
+		String visualType = config.get("visual");
+        if ("repaint".equals(visualType)) {
+        	visual = new HeadVisual(activity);
+        } else {
+        	visual = new HeadVisualDirect(activity);
+        }
 		hearing = new HeadHearing(activity);
-		vision = new HeadVisionOffline(activity);
+
+		String visionType = config.get("vision");
+        if ("realtime".equals(visionType)) {
+        	vision = new HeadVision(activity);
+        } else {
+        	vision = new HeadVisionOffline(activity);
+        }
 		motion = new HeadMotion(activity, config.get("motionDriverIP"));
 	}
 	
@@ -35,6 +47,14 @@ public class HeadController {
 		motion.init();
 	}
 	
+	public void pause() {
+		voice.pause();
+		visual.pause();
+		hearing.pause();
+		vision.pause();
+		motion.pause();
+	}
+
 	public void destroy() {
 		voice.destroy();
 		visual.destroy();

@@ -1,7 +1,13 @@
 package com.pisoft.headcontroller.head;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PointF;
 import android.hardware.Camera;
 import android.media.FaceDetector;
 import android.media.FaceDetector.Face;
@@ -58,6 +64,8 @@ public class HeadVisionOffline extends HeadVision {
 	}
 	
 	private void takePicture(final OnCompleteListener listener) {
+		camera.startPreview();
+		
 		camera.takePicture(null, null, new Camera.PictureCallback() {
 			public void onPictureTaken(byte[] data, Camera camera) {
 			    BitmapFactory.Options opts = new BitmapFactory.Options();
@@ -68,9 +76,28 @@ public class HeadVisionOffline extends HeadVision {
 				Face[] faces = new Face[5];
 				int numOfFaces = fd.findFaces(img, faces);
 				
-				listener.onComplete("Number of found faces = " + numOfFaces);
+				List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 				
-				camera.startPreview();
+				for (int i = 0; i < numOfFaces; i++) {
+					Face f = faces[i];
+					
+					if (f.confidence() < 0.3) {
+						continue;
+					}
+					
+					Map<String, Object> faceObject = new HashMap<String, Object>();
+					
+					faceObject.put("eyeDistance", (int)f.eyesDistance());
+					
+					PointF midPoint = new PointF();
+					f.getMidPoint(midPoint);
+					faceObject.put("positionX", (int)midPoint.x);
+					faceObject.put("positionY", (int)midPoint.y);
+					
+					result.add(faceObject);
+				}
+
+				listener.onComplete(result);
 			}
 		});
 	}

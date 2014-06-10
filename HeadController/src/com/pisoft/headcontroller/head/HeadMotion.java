@@ -94,6 +94,9 @@ public class HeadMotion extends AbstractHeadSense {
 		});
 	}
 
+	protected void pause() {
+	}
+
 	protected void destroy() {
 	}
 	

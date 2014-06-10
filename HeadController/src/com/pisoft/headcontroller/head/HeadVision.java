@@ -69,7 +69,6 @@ public class HeadVision extends AbstractHeadSense {
 			public void surfaceCreated(SurfaceHolder holder) {
 				try {
 					camera.setPreviewDisplay(cameraPreviewSurface.getHolder());
-					camera.startPreview();
 					markReady();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -81,7 +80,13 @@ public class HeadVision extends AbstractHeadSense {
 			}
 		});
 	}
-	
+
+	protected void pause() {
+		if (camera != null) {
+			stopFaceDetection();
+		}
+	}
+
 	protected void destroy() {
 		if (camera != null) {
 			stopFaceDetection();
@@ -94,6 +99,7 @@ public class HeadVision extends AbstractHeadSense {
 		if (!isReady()) {
 			return false;
 		}
+		camera.startPreview();
 
 		camera.stopFaceDetection();
 		camera.setFaceDetectionListener(new Camera.FaceDetectionListener() {

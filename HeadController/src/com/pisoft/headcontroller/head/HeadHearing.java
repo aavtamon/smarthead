@@ -28,9 +28,12 @@ public class HeadHearing extends AbstractHeadSense {
 		setLanguage(Locale.US);
 	}
 
-	protected void destroy() {
+	protected void pause() {
 	}
 	
+	protected void destroy() {
+	}
+
 	public void setLanguage(final Locale language) {
 		if (language == Locale.US) {
 			ietfLanguage = "en-US";

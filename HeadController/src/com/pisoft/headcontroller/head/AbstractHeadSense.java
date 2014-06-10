@@ -11,6 +11,7 @@ public abstract class AbstractHeadSense {
 	}
 	
 	protected abstract void init();
+	protected abstract void pause();
 	protected abstract void destroy();
 	
 	

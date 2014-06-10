@@ -40,6 +40,10 @@ public class HeadVoice extends AbstractHeadSense {
 		});
 	}
 	
+	protected void pause() {
+		tts.stop();
+	}
+
 	protected void destroy() {
 		tts.shutdown();
 	}
