@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import android.speech.tts.UtteranceProgressListener;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.pisoft.headcontroller.ControllingActivity;
@@ -23,7 +24,7 @@ public class HeadController {
 		voice = new HeadVoice(activity);
 
 		String visualType = config.get("visual");
-        if ("repaint".equals(visualType)) {
+        if (false || "repaint".equals(visualType)) {
         	visual = new HeadVisual(activity);
         } else {
         	visual = new HeadVisualDirect(activity);
@@ -31,11 +32,12 @@ public class HeadController {
 		hearing = new HeadHearing(activity);
 
 		String visionType = config.get("vision");
-        if ("realtime".equals(visionType)) {
+		if ("realtime".equals(visionType)) {
         	vision = new HeadVision(activity);
         } else {
         	vision = new HeadVisionOffline(activity);
         }
+		
 		motion = new HeadMotion(activity, config.get("motionDriverIP"));
 	}
 	

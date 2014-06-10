@@ -2,8 +2,10 @@ package com.pisoft.headcontroller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,12 +53,7 @@ public class HtmlScreen extends ControllingActivity {
 		headController.init();
 
 		String url = config.get("startUrl");
-		if (url == null) {
-			Log.w("HeadController", "No startUrl in the config file - assuming built in");
-			url = "file:///android_asset/menu.html";
-		}
 
-		//webView.loadUrl("http://192.168.0.102:8050/menu.html");
 		webView.loadUrl(url);
 	}
 	
@@ -134,14 +131,22 @@ public class HtmlScreen extends ControllingActivity {
 		config = new HashMap<String, String>();
 		
 		File configFile = new File(getExternalFilesDir(null), "config.txt");
+		
 		if (!configFile.isFile()) {
-			return;
+			createDefaultConfig(configFile);
+			Log.d("HeadController", "No config file yet created -- creating one with defaults...");
 		}
 		
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(configFile));
 			String nextLine;
+			
 			while((nextLine = reader.readLine()) != null) {
+				nextLine = nextLine.trim();
+				if (nextLine.length() == 0 || nextLine.startsWith("//")) {
+					continue;
+				}
+				
 				String[] parts = nextLine.split("=");
 				if (parts.length != 2) {
 					Log.e("HeadController", "Error in the config file: " + nextLine);
@@ -152,6 +157,28 @@ public class HtmlScreen extends ControllingActivity {
 			reader.close();
 		} catch (IOException ioe) {
 			Log.e("HeadController", "Error reading config file", ioe);
+		}
+	}
+	
+	private void createDefaultConfig(File configFile) {
+		try {
+			PrintWriter pw = new PrintWriter(configFile);
+			
+			pw.println("startUrl=file:///android_asset/menu.html");
+
+			pw.println();
+			pw.println("//Visual Configuration");
+			pw.println("visual=direct");
+			pw.println("//visual=repaint");
+			
+			pw.println();
+			pw.println("//Vision Configuration");
+			pw.println("vision=realtime");
+			pw.println("//vision=offline");
+			
+			pw.close();
+		} catch (FileNotFoundException e) {
+			Log.e("HeadController", "Error creating deafult config file", e);
 		}
 	}
 }
