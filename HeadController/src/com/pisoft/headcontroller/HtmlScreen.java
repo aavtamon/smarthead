@@ -60,13 +60,15 @@ public class HtmlScreen extends ControllingActivity {
 		webView.loadUrl(url);
 	}
 	
-	protected void onDestroy() {
+	protected void onPause() {
 		headController.destroy();
 
-		super.onDestroy();
+		super.onPause();
 	}
 
 	protected void callJSCallback(final String callback, final Object params) {
+		Log.d("ANTON", "Notifying callback " + callback + " with " + params);
+		
 		String callbackParam = null;
 		if (params == null) {
 			callbackParam = "null";
@@ -74,13 +76,20 @@ public class HtmlScreen extends ControllingActivity {
 			callbackParam = "\"" + params.toString() + "\"";
 		} else {
 			callbackParam = convertObjectToJson(params);
+			Log.d("ANTON", "Object param was converted to " + callbackParam);
 		}
+		
+		Log.d("ANTON", "The composed callbackParam is " + callbackParam);
 		
 		String javaScript = "headController['___tempJSBridgeFunctionParam'] = " + callbackParam + "; "
 				            + "headController['___tempJSBridgeFunction'] = " + callback + "; headController['___tempJSBridgeFunction'](headController['___tempJSBridgeFunctionParam']); "
 				            + "delete headController['___tempJSBridgeFunction']; delete headController['___tempJSBridgeFunctionParam'];";
 
+		Log.d("ANTON", "The composed javascript is " + javaScript);
+		
 		webView.loadUrl("javascript:{ " + javaScript + " }");
+		
+		Log.d("ANTON", "Web client was informed");
 	}
 	
 	

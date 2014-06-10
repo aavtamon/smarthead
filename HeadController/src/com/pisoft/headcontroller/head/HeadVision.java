@@ -17,8 +17,8 @@ import com.pisoft.headcontroller.ControllingActivity;
 import com.pisoft.headcontroller.R;
 
 public class HeadVision extends AbstractHeadSense {
-	private Camera camera;
-	private SurfaceView cameraPreviewSurface;
+	protected Camera camera;
+	protected SurfaceView cameraPreviewSurface;
 	
 	public interface OnCompleteListener {
 		public void onComplete(Object data);
@@ -50,13 +50,20 @@ public class HeadVision extends AbstractHeadSense {
 			return;
 		}
 		
+		if (camera.getParameters().getMaxNumDetectedFaces() == 0) {
+			Log.e("HeadController", "Camera does not support face recognition");
+			return;
+		}
+		
+		camera.setDisplayOrientation(0);
+		
 		cameraPreviewSurface = (SurfaceView)activity.findViewById(R.id.CameraPreview);
 		cameraPreviewSurface.setZOrderOnTop(true);
 	    SurfaceHolder holder = cameraPreviewSurface.getHolder();
 	    
 	    holder.addCallback(new SurfaceHolder.Callback() {
 			public void surfaceDestroyed(SurfaceHolder holder) {
-				camera.stopPreview();
+//				camera.stopPreview();
 			}
 			
 			public void surfaceCreated(SurfaceHolder holder) {
@@ -77,6 +84,7 @@ public class HeadVision extends AbstractHeadSense {
 	
 	protected void destroy() {
 		if (camera != null) {
+			stopFaceDetection();
 			camera.release();
 		}
 	}
@@ -86,8 +94,8 @@ public class HeadVision extends AbstractHeadSense {
 		if (!isReady()) {
 			return false;
 		}
-		camera.stopFaceDetection();
 
+		camera.stopFaceDetection();
 		camera.setFaceDetectionListener(new Camera.FaceDetectionListener() {
 			public void onFaceDetection(Face[] faces, Camera camera) {
 				if (!continuesDetectionMode) {
@@ -105,13 +113,16 @@ public class HeadVision extends AbstractHeadSense {
 					
 					result.add(faceObject);
 				}
-				
+
 				listener.onComplete(result);
 			}
 		});
-		
 		camera.startFaceDetection();
 
 		return true;
+	}
+	
+	public void stopFaceDetection() {
+		camera.stopFaceDetection();
 	}
 }

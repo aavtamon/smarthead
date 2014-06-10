@@ -23,7 +23,7 @@ public class HeadController {
 		voice = new HeadVoice(activity);
 		visual = new HeadVisualDirect(activity);
 		hearing = new HeadHearing(activity);
-		vision = new HeadVision(activity);
+		vision = new HeadVisionOffline(activity);
 		motion = new HeadMotion(activity, config.get("motionDriverIP"));
 	}
 	
@@ -86,6 +86,12 @@ public class HeadController {
 		});
 	}
 	
+
+	@JavascriptInterface
+	public boolean detectFaces(final String callback) {
+		return detectFaces(callback, false);
+	}
+
 	@JavascriptInterface
 	public boolean detectFaces(final String callback, final boolean continuesDetectionMode) {
 		return vision.detectFaces(new HeadVision.OnCompleteListener() {

@@ -17,7 +17,7 @@
 				
 				headController.detectFaces("" + function(scanInfo) {
 					document.getElementById("message_area").innerHTML = "<center>Faces detected. Scan info: " + JSON.stringify(scanInfo) + "</center>";
-				});
+				}, true);
 				
 			});
 		}

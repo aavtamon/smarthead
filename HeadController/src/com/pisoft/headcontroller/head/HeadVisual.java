@@ -53,7 +53,6 @@ public class HeadVisual extends AbstractHeadSense {
 						}
                     }
 				}, 300);
-				
 			}
 		});
 	}
