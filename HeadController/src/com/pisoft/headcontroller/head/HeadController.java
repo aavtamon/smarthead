@@ -4,7 +4,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.pisoft.headcontroller.ControllingActivity;
@@ -24,7 +23,7 @@ public class HeadController {
 		voice = new HeadVoice(activity);
 
 		String visualType = config.get("visual");
-        if (false || "repaint".equals(visualType)) {
+        if ("repaint".equals(visualType)) {
         	visual = new HeadVisual(activity);
         } else {
         	visual = new HeadVisualDirect(activity);
@@ -79,7 +78,20 @@ public class HeadController {
 		}
 	}
 
-	
+	@JavascriptInterface
+	public int getScreenWidth() {
+		return activity.getWindowManager().getDefaultDisplay().getWidth(); 
+	}
+
+	@JavascriptInterface
+	public int getScreenHeight() {
+		return activity.getWindowManager().getDefaultDisplay().getHeight(); 
+	}
+
+	@JavascriptInterface
+	public boolean setBounds(final int x, final int y, final int width, final int height) {
+		return visual.setBounds(x, y, width, height);
+	}
 	
 	@JavascriptInterface
 	public boolean communicate(final String text, final String callback) {

@@ -22,13 +22,14 @@ public class HeadVisualDirect extends HeadVisual {
 	
 	public HeadVisualDirect(final ControllingActivity activity) {
 		super(activity);
-	}
+
+		view = (SurfaceView)activity.findViewById(R.id.HeadDirect);
+}
 
 	protected void init() {
-		SurfaceView view = (SurfaceView)activity.findViewById(R.id.HeadDirect);
-		headHolder = view.getHolder();
+		headHolder = ((SurfaceView)view).getHolder();
 		headHolder.setFormat(PixelFormat.TRANSLUCENT);
-		view.setZOrderOnTop(true);
+		((SurfaceView)view).setZOrderOnTop(true);
 		headHolder.addCallback(new SurfaceHolder.Callback() {
 			public void surfaceDestroyed(SurfaceHolder holder) {
 				markNotReady();

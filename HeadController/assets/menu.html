@@ -5,7 +5,15 @@
 	    }
 	
 		function useHeadController() {
-			document.getElementById("readiness").innerHTML = "<center>Readiness: " + headController.isReady() + "</center>";
+			var screenWidth = headController.getScreenWidth();
+			var screenHeight = headController.getScreenHeight();
+			
+			document.getElementById("readiness").innerHTML = "<center>Readiness: " + headController.isReady() + ", screen: " + screenWidth + "x" + screenHeight + "</center>";
+			
+			var headWidth = Math.min(screenWidth / 4, screenHeight / 3);
+			var headHeight = headWidth;
+			
+			headController.setBounds(20, screenHeight - headHeight - 20, headWidth, headHeight);
 			
 			headController.communicate("Hello Anton, I am glad to see you!", "" + function() {
 				document.getElementById("message_area").innerHTML = "<center>Speaking finished</center>";
